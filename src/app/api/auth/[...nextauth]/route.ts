@@ -1,5 +1,23 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { JWT } from "next-auth/jwt";
+
+// 定义用户类型
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+// 定义会话类型
+interface Session {
+  user: {
+    role?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
 
 export const authOptions = {
   providers: [
@@ -36,15 +54,15 @@ export const authOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT, user?: User }) {
       if (user) {
         token.role = user.role;
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: Session, token: JWT }) {
       if (token && session.user) {
-        session.user.role = token.role;
+        session.user.role = token.role as string;
       }
       return session;
     }
