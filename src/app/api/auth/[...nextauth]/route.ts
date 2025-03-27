@@ -22,6 +22,13 @@ interface CustomSession extends Session {
   };
 }
 
+// 定义session回调参数类型
+interface SessionParams {
+  session: CustomSession;
+  token: JWT;
+  [key: string]: any;
+}
+
 export const authOptions = {
   providers: [
     CredentialsProvider({
@@ -63,8 +70,8 @@ export const authOptions = {
       }
       return token;
     },
-    // 使用更通用的类型定义，避免类型错误
-    async session(params) {
+    // 使用明确的类型定义，避免隐式any类型错误
+    async session(params: SessionParams) {
       const { session, token } = params;
       if (token && session.user) {
         session.user.role = token.role as string;
