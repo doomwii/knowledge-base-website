@@ -33,7 +33,8 @@ async function dbConnect() {
       bufferCommands: false,
     };
     
-    cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
+    // 使用类型断言确保TypeScript知道MONGODB_URI不是undefined
+    cached.promise = mongoose.connect(MONGODB_URI as string).then((mongoose) => {
       return mongoose;
     });
   }
