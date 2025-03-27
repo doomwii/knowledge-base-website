@@ -54,7 +54,7 @@ export const authOptions = {
     })
   ],
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
   },
   callbacks: {
     async jwt({ token, user }: { token: JWT, user?: User }) {
@@ -63,8 +63,9 @@ export const authOptions = {
       }
       return token;
     },
-    async session({ session, token }) {
-      // 确保session.user存在
+    // 使用更通用的类型定义，避免类型错误
+    async session(params) {
+      const { session, token } = params;
       if (token && session.user) {
         session.user.role = token.role as string;
       }
