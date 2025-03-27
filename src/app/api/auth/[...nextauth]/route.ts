@@ -1,7 +1,6 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { JWT } from "next-auth/jwt";
-import { Session } from "next-auth";
 
 // 定义用户类型
 interface User {
@@ -11,25 +10,8 @@ interface User {
   role: string;
 }
 
-// 定义自定义会话类型
-interface CustomSession extends Session {
-  user: {
-    role?: string;
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-    [key: string]: any;
-  };
-}
-
-// 定义session回调参数类型
-interface SessionParams {
-  session: CustomSession;
-  token: JWT;
-  [key: string]: any;
-}
-
-export const authOptions = {
+// 使用NextAuth官方推荐的类型定义方式
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -61,19 +43,17 @@ export const authOptions = {
     })
   ],
   session: {
-    strategy: "jwt" as const,
+    strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }: { token: JWT, user?: User }) {
+    async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
       }
       return token;
     },
-    // 使用明确的类型定义，避免隐式any类型错误
-    async session(params: SessionParams) {
-      const { session, token } = params;
-      if (token && session.user) {
+    async session({ session, token }) {
+      if (session.user) {
         session.user.role = token.role as string;
       }
       return session;
@@ -84,5 +64,6 @@ export const authOptions = {
   }
 };
 
+// 使用NextAuth官方API创建处理程序
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
