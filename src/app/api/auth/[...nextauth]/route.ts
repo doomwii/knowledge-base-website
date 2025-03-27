@@ -1,14 +1,5 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { JWT } from "next-auth/jwt";
-
-// 定义用户类型
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
 
 // 使用NextAuth官方推荐的类型定义方式
 export const authOptions: NextAuthOptions = {
@@ -54,7 +45,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role as string;
+        session.user.role = token.role;
       }
       return session;
     }
