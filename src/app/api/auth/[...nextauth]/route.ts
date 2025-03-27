@@ -10,6 +10,11 @@ export const authOptions = {
         password: { label: "密码", type: "password" }
       },
       async authorize(credentials) {
+        // 添加类型检查，确保credentials不为undefined
+        if (!credentials?.username || !credentials?.password) {
+          return null;
+        }
+        
         // 这里可以连接数据库验证，简化版本只允许一个管理员登录
         if (
           credentials.username === process.env.ADMIN_USERNAME &&
@@ -50,5 +55,4 @@ export const authOptions = {
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };
