@@ -1,51 +1,97 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-interface Props {
+interface ErrorBoundaryProps {
   children: React.ReactNode;
 }
 
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
-  error?: Error;
+  error: Error | null;
 }
 
-class ErrorBoundary extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
+export default function ErrorBoundary({ children }: ErrorBoundaryProps) {
+  const [state, setState] = useState<ErrorBoundaryState>({
+    hasError: false,
+    error: null
+  });
+
+  useEffect(() => {
+    // 添加全局错误处理
+    const handleError = (event: ErrorEvent) => {
+      console.error('捕获到渲染错误:', event.error);
+      setState({
+        hasError: true,
+        error: event.error
+      });
+    };
+
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
+
+  if (state.hasError) {
+    return (
+      <div className="error-container" style={{ padding: '20px', margin: '20px', border: '1px solid red' }}>
+        <h2>页面加载出现问题</h2>
+        <p>我们正在努力修复这个问题。请稍后再试。</p>
+        <button 
+          onClick={() => {
+            setState({ hasError: false, error: null });
+            window.location.reload();
+          }}
+          style={{ padding: '8px 16px', background: '#0070f3', color: 'white', border: 'none', borderRadius: '4px' }}
+        >
+          重试
+        </button>
+        {state.error && (
+          <pre style={{ marginTop: '20px', padding: '10px', background: '#f7f7f7' }}>
+            {state.error.toString()}
+          </pre>
+        )}
+      </div>
+    );
   }
 
-  static getDerivedStateFromError(error: Error): State {
-    // 更新状态，下一次渲染将显示错误UI
+  return <>{children}</>;
+}
+
+// 类组件版本的错误边界，用于捕获子组件中的错误
+export class ClassErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    // 可以在这里记录错误信息
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error('组件错误:', error, errorInfo);
   }
 
   render(): React.ReactNode {
     if (this.state.hasError) {
       return (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-          <h2 className="text-xl font-bold text-red-700 mb-2">页面加载出错</h2>
-          <p className="text-red-600 mb-4">
-            抱歉，页面加载过程中出现了问题。请尝试刷新页面或联系管理员。
-          </p>
-          {this.state.error && (
-            <pre className="bg-white p-2 rounded text-sm overflow-auto">
-              {this.state.error.toString()}
-            </pre>
-          )}
-          <button
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={() => this.setState({ hasError: false })}
+        <div className="error-container" style={{ padding: '20px', margin: '20px', border: '1px solid red' }}>
+          <h2>组件渲染出现问题</h2>
+          <p>我们正在努力修复这个问题。请稍后再试。</p>
+          <button 
+            onClick={() => {
+              this.setState({ hasError: false, error: null });
+              window.location.reload();
+            }}
+            style={{ padding: '8px 16px', background: '#0070f3', color: 'white', border: 'none', borderRadius: '4px' }}
           >
             重试
           </button>
+          {this.state.error && (
+            <pre style={{ marginTop: '20px', padding: '10px', background: '#f7f7f7' }}>
+              {this.state.error.toString()}
+            </pre>
+          )}
         </div>
       );
     }
@@ -53,5 +99,3 @@ class ErrorBoundary extends React.Component<Props, State> {
     return this.props.children;
   }
 }
-
-export default ErrorBoundary;

@@ -1,21 +1,49 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: 'export',  // 启用静态导出
+  // 启用静态导出
+  output: 'export',
+  // 禁用图像优化，这在静态导出中不支持
   images: {
-    unoptimized: true, // 静态导出需要禁用图片优化
+    unoptimized: true,
   },
-  // 禁用压缩，避免某些渲染问题
-  compress: false,
   // 添加环境变量配置
   env: {
-    MONGODB_URI: process.env.MONGODB_URI,
-    NEXTAUTH_URL: 'https://knowledge-base-website-theta.vercel.app',
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6',
-    ADMIN_USERNAME: process.env.ADMIN_USERNAME || 'doomwang91',
-    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'mina1995',
+    MONGODB_URI: "mongodb+srv://doomwang:wang@cluster0.6doay8h.mongodb.net/IPkonwledge?retryWrites=true&w=majority&appName=Cluster0",
+    NEXTAUTH_URL: "https://knowledge-base-website-theta.vercel.app",
+    NEXTAUTH_SECRET: "a1b2c3d4e5f6g7h819j0k1l2m3n4o5p6",
+    ADMIN_USERNAME: "doomwang91",
+    ADMIN_PASSWORD: "mina1995"
   },
-  // 静态导出模式不支持自定义headers，已移除
+  // 禁用严格模式以避免潜在的渲染问题
+  reactStrictMode: false,
+  // 配置跨域
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
+          },
+        ],
+      },
+    ];
+  },
+  // 禁用webpack5的一些功能以提高兼容性
+  webpack: (config) => {
+    config.resolve.fallback = { fs: false, path: false };
+    return config;
+  },
 };
 
 module.exports = nextConfig;

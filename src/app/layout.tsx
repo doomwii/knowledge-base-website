@@ -1,29 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import ErrorBoundary from '../components/ErrorBoundary';
-import './globals.css';
-import { Inter } from 'next/font/google';
-
-const inter = Inter({ subsets: ['latin'] });
+import Providers from '@/components/Providers';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  // 使用客户端渲染来避免服务端渲染问题
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   return (
-    <html lang="zh">
-      <body className={inter.className}>
+    <html lang="zh-CN">
+      <body>
         <ErrorBoundary>
-          {isClient ? children : <div>页面加载中...</div>}
+          <Providers>{children}</Providers>
         </ErrorBoundary>
       </body>
     </html>
