@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// 这个中间件确保NextAuth在生产环境中正常工作
+// 简化的中间件，只处理基本的跨域问题
 export function middleware(request: NextRequest) {
-  // 允许跨域请求
+  // 创建响应对象
   const response = NextResponse.next();
   
-  // 添加CORS头
+  // 添加基本的CORS头
   response.headers.set('Access-Control-Allow-Origin', '*');
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
   return response;
 }
 
-// 配置中间件应用的路径
+// 只应用于API路由
 export const config = {
   matcher: ['/api/:path*'],
 };

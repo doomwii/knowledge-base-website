@@ -1,8 +1,9 @@
 'use client';
-import React, { ErrorInfo, ReactNode } from 'react';
+
+import React from 'react';
 
 interface Props {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 interface State {
@@ -17,14 +18,16 @@ class ErrorBoundary extends React.Component<Props, State> {
   }
 
   static getDerivedStateFromError(error: Error): State {
+    // 更新状态，下一次渲染将显示错误UI
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+    // 可以在这里记录错误信息
     console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
-  render(): ReactNode {
+  render(): React.ReactNode {
     if (this.state.hasError) {
       return (
         <div className="p-4 bg-red-50 border border-red-200 rounded-md">
@@ -32,9 +35,11 @@ class ErrorBoundary extends React.Component<Props, State> {
           <p className="text-red-600 mb-4">
             抱歉，页面加载过程中出现了问题。请尝试刷新页面或联系管理员。
           </p>
-          <pre className="bg-white p-2 rounded text-sm overflow-auto">
-            {this.state.error?.toString()}
-          </pre>
+          {this.state.error && (
+            <pre className="bg-white p-2 rounded text-sm overflow-auto">
+              {this.state.error.toString()}
+            </pre>
+          )}
           <button
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             onClick={() => this.setState({ hasError: false })}
@@ -44,6 +49,7 @@ class ErrorBoundary extends React.Component<Props, State> {
         </div>
       );
     }
+
     return this.props.children;
   }
 }

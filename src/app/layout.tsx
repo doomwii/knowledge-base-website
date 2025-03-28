@@ -1,27 +1,31 @@
-import './globals.css'
-import ErrorBoundary from '../components/ErrorBoundary'
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+'use client';
 
-const inter = Inter({ subsets: ['latin'] })
+import { useEffect, useState } from 'react';
+import ErrorBoundary from '../components/ErrorBoundary';
+import './globals.css';
+import { Inter } from 'next/font/google';
 
-export const metadata: Metadata = {
-  title: '知识产权知识库',
-  description: '专业的知识产权学习平台',
-}
+const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  // 使用客户端渲染来避免服务端渲染问题
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <html lang="zh">
       <body className={inter.className}>
         <ErrorBoundary>
-          {children}
+          {isClient ? children : <div>页面加载中...</div>}
         </ErrorBoundary>
       </body>
     </html>
-  )
+  );
 }
