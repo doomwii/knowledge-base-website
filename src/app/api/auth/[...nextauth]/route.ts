@@ -3,6 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 // 使用NextAuth官方推荐的类型定义方式
 export const authOptions: NextAuthOptions = {
+  // 添加调试模式，帮助排查问题
+  debug: true,
   providers: [
     CredentialsProvider({
       name: "Credentials",
