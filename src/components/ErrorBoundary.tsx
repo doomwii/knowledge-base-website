@@ -1,6 +1,4 @@
-
 'use client';
-
 import React, { ErrorInfo, ReactNode } from 'react';
 
 interface Props {
@@ -46,7 +44,6 @@ class ErrorBoundary extends React.Component<Props, State> {
         </div>
       );
     }
-
     return this.props.children;
   }
 }
